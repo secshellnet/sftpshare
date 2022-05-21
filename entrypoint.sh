@@ -22,11 +22,13 @@ for user in ${USERS}; do
         echo "Warning: Unable to locate public ssh key for user ${user}!"
     fi
 
-    cat <<_EOF >> /etc/ssh/sshd_config
+    if ! grep "Match User ${user}" /etc/ssh/sshd_config > /dev/null; then
+      cat <<_EOF >> /etc/ssh/sshd_config
 Match User ${user}
    ChrootDirectory /home
    ForceCommand internal-sftp -d /${user}
 _EOF
+    fi
 done
 
 /usr/sbin/sshd -eD
